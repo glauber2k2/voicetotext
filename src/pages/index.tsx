@@ -136,7 +136,7 @@ function App(): JSX.Element {
   }
   return (
     <div className='speech'>
-      <p>RECONHECIMENTO DE VOZ</p>
+      <p>FERRAMENTA DE RECONHECIMENTO DE VOZ PARA CBR</p>
       <textarea ref={textareaRef} id='textarea'></textarea>
       <div>
         <button ref={btnGravarRef} id='btnGravar'>
