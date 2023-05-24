@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import styles from '../styles/Home.module.css';
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -135,22 +136,24 @@ function App(): JSX.Element {
     document.body.removeChild(element);
   }
   return (
-    <div className='speech'>
-      <p>FERRAMENTA DE RECONHECIMENTO DE VOZ PARA CBR</p>
-      <textarea ref={textareaRef} id='textarea'></textarea>
-      <div>
-        <button ref={btnGravarRef} id='btnGravar'>
-          <i className='fas fa-microphone'>GRAVAR</i>
-        </button>
-        <button ref={btnPararRef} id='btnParar' disabled>
-          <i className='fas fa-microphone-slash'>PARAR</i>
-        </button>
-        <button ref={btnBaixarRef} id='btnBaixar'>
-          <i className='fas fa-download'>BAIXAR</i>
-        </button>
-        <button ref={btnLimparRef} id='btnLimpar'>
-          <i className='fas fa-trash-alt'>LIMPAR</i>
-        </button>
+    <div className={styles.container}>
+      <div className={styles.textBox}>
+        <h1>VOZ PARA TEXTO</h1>
+        <textarea ref={textareaRef} id='textarea'></textarea>
+        <div>
+          <button ref={btnGravarRef} id='btnGravar'>
+            GRAVAR
+          </button>
+          <button ref={btnPararRef} id='btnParar'>
+            PARAR
+          </button>
+          <button ref={btnBaixarRef} id='btnBaixar'>
+            BAIXAR
+          </button>
+          <button ref={btnLimparRef} id='btnLimpar'>
+            LIMPAR
+          </button>
+        </div>
       </div>
     </div>
   );
