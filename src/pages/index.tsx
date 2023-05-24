@@ -140,7 +140,7 @@ function App(): JSX.Element {
       <div className={styles.textBox}>
         <h1>VOZ PARA TEXTO</h1>
         <textarea ref={textareaRef} id='textarea'></textarea>
-        <div>
+        <div className={styles.buttons}>
           <button ref={btnGravarRef} id='btnGravar'>
             GRAVAR
           </button>
