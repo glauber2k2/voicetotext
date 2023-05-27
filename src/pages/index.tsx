@@ -1,5 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../styles/Home.module.css';
+
+import {
+  Microphone,
+  MicrophoneSlash,
+  DownloadSimple,
+  Trash,
+} from 'phosphor-react';
+import Image from 'next/image';
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -135,26 +143,50 @@ function App(): JSX.Element {
 
     document.body.removeChild(element);
   }
+
+  const [isRec, setIsRec] = useState(false);
+
+  function handleActiveRec() {
+    setIsRec(true);
+  }
+
+  function handleDisableRec() {
+    setIsRec(false);
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.textBox}>
-        <h1>VOZ PARA TEXTO</h1>
-        <textarea ref={textareaRef} id='textarea'></textarea>
-        <div className={styles.buttons}>
-          <button ref={btnGravarRef} id='btnGravar'>
-            GRAVAR
-          </button>
-          <button ref={btnPararRef} id='btnParar'>
-            PARAR
-          </button>
-          <button ref={btnBaixarRef} id='btnBaixar'>
-            BAIXAR
-          </button>
-          <button ref={btnLimparRef} id='btnLimpar'>
-            LIMPAR
-          </button>
-        </div>
+      <h1>Transcrição</h1>
+      <h2>Áudio para texto</h2>
+
+      <label>Observe o campo abaixo:</label>
+      <textarea ref={textareaRef} id='textarea'></textarea>
+      <div className={styles.buttons}>
+        <button
+          className={isRec ? styles.rec : styles.noRec}
+          onClick={handleActiveRec}
+          ref={btnGravarRef}
+          id='btnGravar'
+        >
+          <Microphone weight='fill' />
+        </button>
+        <button ref={btnPararRef} id='btnParar' onClick={handleDisableRec}>
+          <MicrophoneSlash weight='fill' />
+        </button>
+        <button ref={btnBaixarRef} id='btnBaixar'>
+          <DownloadSimple weight='regular' />
+        </button>
+        <button ref={btnLimparRef} id='btnLimpar'>
+          <Trash weight='bold' />
+        </button>
       </div>
+
+      <Image
+        src='/images/CONTE_LOGO_REDUZIDO_BRANCO.png'
+        width={1280}
+        height={1280}
+        alt=' '
+      />
     </div>
   );
 }
