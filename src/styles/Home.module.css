@@ -83,20 +83,22 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 20% 2.8rem 5% 2.8rem;
+    padding: 15% 2.8rem 2% 2.8rem;
+    width: 100%;
+    height: 100vh;
   }
 
   .container h1 {
-    font-size: 40px;
+    font-size: 11vw;
   }
 
   .container h2 {
-    font-size: 20.36px;
+    font-size: 5.4vw;
   }
 
   .container label {
     text-align: center;
-    font-size: 18px;
+    font-size: 4.8vw;
     width: 18.8rem;
   }
 
@@ -112,8 +114,8 @@
 
   .buttons button,
   .buttons button.noRec {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 15vw;
+    height: 15vw;
   }
 
   .buttons svg {
@@ -123,8 +125,8 @@
 
   .container img {
     object-fit: scale-down;
-    width: 10rem;
-    height: 3rem;
+    width: 25vw;
+    height: 10vw;
     margin-top: auto;
   }
 }
