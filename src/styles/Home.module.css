@@ -108,7 +108,7 @@
   }
 
   .buttons {
-    gap: 25%;
+    gap: 25% 25%;
     flex-wrap: wrap;
   }
 
