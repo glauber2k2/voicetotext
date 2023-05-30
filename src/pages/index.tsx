@@ -1,18 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../styles/Home.module.css';
 
-import {
-  Microphone,
-  MicrophoneSlash,
-  DownloadSimple,
-  Trash,
-} from 'phosphor-react';
+import { Microphone, DownloadSimple, Trash } from 'phosphor-react';
 import Image from 'next/image';
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
   lang: string;
   onresult: (event: SpeechRecognitionEvent) => void;
+  onaudiostart?: () => void;
+  onaudioend?: () => void;
   start(): void;
   stop(): void;
 }
@@ -46,8 +43,8 @@ function App(): JSX.Element {
 
   useEffect(() => {
     class SpeechApi {
-      speechApi: SpeechRecognition | undefined; // Made speechApi property public
-      private output: HTMLTextAreaElement | null = null; // Marked as optional with default value
+      speechApi: SpeechRecognition | undefined;
+      private output: HTMLTextAreaElement | null = null;
 
       constructor() {
         const SpeechToText =
@@ -74,6 +71,16 @@ function App(): JSX.Element {
             this.output.value += transcript;
           }
         };
+
+        this.speechApi.onaudiostart = () => {
+          console.log('Captura de áudio iniciada.');
+        };
+
+        this.speechApi.onaudioend = () => {
+          console.log('Captura de áudio encerrada.');
+          setIsRec(false);
+          postText();
+        };
       }
 
       start() {
@@ -96,22 +103,35 @@ function App(): JSX.Element {
     }
 
     btnGravarRef.current!.addEventListener('click', () => {
-      btnGravarRef.current!.disabled = true;
-      btnPararRef.current!.disabled = false;
-      speech.start();
+      // Verifique se o botão está desabilitado
+      if (!btnGravarRef.current!.disabled) {
+        // Desabilite o botão
+        btnGravarRef.current!.disabled = true;
+
+        // Execute a ação desejada (iniciar gravação)
+        speech.start();
+
+        // Aguarde um período de tempo antes de habilitar o botão novamente
+        setTimeout(() => {
+          btnGravarRef.current!.disabled = false;
+        }, 2000); // Defina o tempo desejado em milissegundos (2 segundos neste exemplo)
+      }
     });
 
     btnPararRef.current!.addEventListener('click', () => {
-      btnGravarRef.current!.disabled = false;
-      btnPararRef.current!.disabled = true;
-      speech.stop();
-    });
+      // Verifique se o botão está desabilitado
+      if (!btnPararRef.current!.disabled) {
+        // Desabilite o botão
+        btnPararRef.current!.disabled = true;
 
-    btnBaixarRef.current!.addEventListener('click', () => {
-      const text = textareaRef.current!.value;
-      const filename = 'speech.txt';
+        // Execute a ação desejada (parar gravação)
+        speech.stop();
 
-      download(text, filename);
+        // Aguarde um período de tempo antes de habilitar o botão novamente
+        setTimeout(() => {
+          btnPararRef.current!.disabled = false;
+        }, 2000); // Defina o tempo desejado em milissegundos (2 segundos neste exemplo)
+      }
     });
 
     btnLimparRef.current!.addEventListener('click', () => {
@@ -125,26 +145,19 @@ function App(): JSX.Element {
       speech.stop();
     };
   }, []);
-  function download(text: string, filename: string) {
+
+  const handleDownload = () => {
+    const formattedData = text.join('\n');
     const element = document.createElement('a');
-
-    element.setAttribute(
-      'href',
-      'data:text/plain;charset=utf-8,' + encodeURIComponent(text)
-    );
-
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-
+    const file = new Blob([formattedData], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'data.txt';
     document.body.appendChild(element);
-
     element.click();
-
     document.body.removeChild(element);
-  }
-
+  };
   const [isRec, setIsRec] = useState(false);
+  const [text, setText] = useState<string[]>([]);
 
   function handleActiveRec() {
     setIsRec(true);
@@ -154,33 +167,59 @@ function App(): JSX.Element {
     setIsRec(false);
   }
 
+  function postText() {
+    const word = textareaRef.current!.value;
+
+    if (word != '') {
+      setText((prevText) => [...prevText, word]);
+      textareaRef.current!.value = '';
+    }
+  }
+
   return (
     <div className={styles.container}>
       <h1>Transcrição</h1>
       <h2>Áudio para texto</h2>
+      <div></div>
 
-      <label>Observe o campo abaixo:</label>
+      <label className={styles.simpleButtons}>
+        Observe o campo abaixo:
+        <button onClick={handleDownload}>
+          <DownloadSimple weight='regular' />
+        </button>
+        <button ref={btnLimparRef} id='btnLimpar'>
+          <Trash weight='bold' />
+        </button>
+      </label>
       <textarea ref={textareaRef} id='textarea'></textarea>
-      <div className={styles.buttons}>
+      <div className={styles.recButton}>
         <button
-          className={isRec ? styles.rec : styles.noRec}
+          className={isRec ? styles.noDisplay : styles.noRec}
           onClick={handleActiveRec}
           ref={btnGravarRef}
           id='btnGravar'
         >
           <Microphone weight='fill' />
         </button>
-        <button ref={btnPararRef} id='btnParar' onClick={handleDisableRec}>
-          <MicrophoneSlash weight='fill' />
-        </button>
-        <button ref={btnBaixarRef} id='btnBaixar'>
-          <DownloadSimple weight='regular' />
-        </button>
-        <button ref={btnLimparRef} id='btnLimpar'>
-          <Trash weight='bold' />
+        <button
+          ref={btnPararRef}
+          id='btnParar'
+          onClick={handleDisableRec}
+          className={isRec ? styles.rec : styles.noDisplay}
+        >
+          <Microphone weight='fill' />
         </button>
       </div>
-
+      {text.length > 0 && (
+        <ul>
+          <h2>Foi falado:</h2>
+          {text.map((item, index) => (
+            <li key={index}>
+              <p>{item}</p>
+            </li>
+          ))}
+        </ul>
+      )}
       <Image
         src='/images/CONTE_LOGO_REDUZIDO_BRANCO.png'
         width={1280}
